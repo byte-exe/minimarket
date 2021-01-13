@@ -410,7 +410,6 @@ private void koneksi_database(){
 }
 
 private void text_empty(){
-    //input_kode.setText("");
     input_nama.setText("");
     cmb_satuan.setSelectedIndex(0);
     input_harga_pokok.setText("");
