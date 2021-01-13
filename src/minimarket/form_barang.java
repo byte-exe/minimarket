@@ -11,6 +11,7 @@ import java.sql.Statement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import javax.swing.JOptionPane;
+import javax.swing.table.DefaultTableModel;
 
 /**
  *
@@ -26,6 +27,7 @@ public class form_barang extends javax.swing.JFrame {
         koneksi_database();
         text_empty();
         AutoNumber();
+        view_barang("SELECT * FROM barang");
     }
 
     /**
@@ -42,7 +44,7 @@ public class form_barang extends javax.swing.JFrame {
         btn_keluar = new javax.swing.JButton();
         pencarian = new javax.swing.JTextField();
         jScrollPane1 = new javax.swing.JScrollPane();
-        jTable1 = new javax.swing.JTable();
+        list_barang = new javax.swing.JTable();
         cmb_cari = new javax.swing.JComboBox<>();
         jLabel2 = new javax.swing.JLabel();
         jLabel3 = new javax.swing.JLabel();
@@ -84,7 +86,7 @@ public class form_barang extends javax.swing.JFrame {
         pencarian.setText("Cari");
         jPanel1.add(pencarian, new org.netbeans.lib.awtextra.AbsoluteConstraints(190, 350, 170, -1));
 
-        jTable1.setModel(new javax.swing.table.DefaultTableModel(
+        list_barang.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
                 {null, null, null, null},
                 {null, null, null, null},
@@ -95,10 +97,10 @@ public class form_barang extends javax.swing.JFrame {
                 "Title 1", "Title 2", "Title 3", "Title 4"
             }
         ));
-        jTable1.setRowHeight(22);
-        jScrollPane1.setViewportView(jTable1);
+        list_barang.setRowHeight(22);
+        jScrollPane1.setViewportView(list_barang);
 
-        jPanel1.add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 390, 480, 130));
+        jPanel1.add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 390, 660, 130));
 
         cmb_cari.setFont(new java.awt.Font("Times New Roman", 1, 14)); // NOI18N
         cmb_cari.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Kode Barang", "Nama Barang" }));
@@ -240,13 +242,11 @@ public class form_barang extends javax.swing.JFrame {
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, 500, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(0, 0, Short.MAX_VALUE))
+            .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, 678, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, 530, Short.MAX_VALUE)
+            .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, 589, Short.MAX_VALUE)
         );
 
         pack();
@@ -254,7 +254,7 @@ public class form_barang extends javax.swing.JFrame {
 
     private void btn_simpanActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_simpanActionPerformed
         try {
-            sql = "INSERT INTO tbl_barang VALUES ('"+input_kode.getText()+
+            sql = "INSERT INTO barang VALUES ('"+input_kode.getText()+
                     "','"+input_nama.getText()+
                     "','"+cmb_satuan.getSelectedItem()+
                     "','"+input_harga_pokok.getText()+
@@ -299,12 +299,12 @@ public class form_barang extends javax.swing.JFrame {
 
     private void btn_editActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_editActionPerformed
         try {
-            sql = "UPDATE tbl_barang SET nm_brg='"+input_nama.getText()+
+            sql = "UPDATE barang SET nama_barang='"+input_nama.getText()+
                     "',satuan='"+cmb_satuan.getSelectedItem()+
-                    "',harga_p='"+input_harga_pokok.getText()+
-                    "',harga_j='"+input_harga_jual.getText()+
+                    "',harga_pokok='"+input_harga_pokok.getText()+
+                    "',harga_jual='"+input_harga_jual.getText()+
                     "',stok='"+input_stok.getText()+
-                    "' WHERE kd_brg='"+input_kode.getText()+"'";
+                    "' WHERE kode_barang='"+input_kode.getText()+"'";
             stat =  con.createStatement();
             stat.execute(sql);
             JOptionPane.showMessageDialog(null, "Sukses Diedit....");
@@ -383,7 +383,7 @@ public class form_barang extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel9;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JTable jTable1;
+    private javax.swing.JTable list_barang;
     private javax.swing.JTextField pencarian;
     // End of variables declaration//GEN-END:variables
 
@@ -397,7 +397,7 @@ private void koneksi_database(){
        Class.forName("com.mysql.jdbc.Driver");
        System.out.println("Driver Ditemukan...");
        try {
-           String url = "jdbc:mysql://localhost:3306/dbminimarket?user=root&password=";
+           String url = "jdbc:mysql://localhost:3306/minimarket?user=root&password=";
            con = DriverManager.getConnection(url);
            System.out.println("Terkoneksi.....");
            
@@ -413,15 +413,16 @@ private void text_empty(){
     //input_kode.setText("");
     input_nama.setText("");
     cmb_satuan.setSelectedIndex(0);
-    input_harga_pokok.setText("0");
-    input_harga_jual.setText("0");
-    input_stok.setText("0");
+    input_harga_pokok.setText("");
+    input_harga_jual.setText("");
+    input_stok.setText("");
+    pencarian.setText("");
     input_kode.requestFocus();
 }
 
 private void AutoNumber(){
     try {
-        sql = "SELECT MAX(RIGHT(kd_brg,4)) AS no_auto FROM tbl_barang";
+        sql = "SELECT MAX(RIGHT(kode_barang,4)) AS no_auto FROM barang";
         stat = con.createStatement();
         rs = stat.executeQuery(sql);
         if(rs.next()){
@@ -443,18 +444,48 @@ private void AutoNumber(){
 
 private void view_data(){
     try {
-        sql = "SELECT * FROM tbl_barang WHERE kd_brg='"+input_kode.getText()+"'";
+        sql = "SELECT * FROM barang WHERE kode_barang='"+input_kode.getText()+"'";
         stat = con.createStatement();
         rs = stat.executeQuery(sql);
         if(rs.next()){
-            input_nama.setText(rs.getString("nm_brg"));
+            input_nama.setText(rs.getString("nama_barang"));
             cmb_satuan.setSelectedItem(rs.getString("satuan"));
-            input_harga_pokok.setText(rs.getString("hrg_pokok"));
-            input_harga_jual.setText(rs.getString("hrg_jual"));
+            input_harga_pokok.setText(rs.getString("harga_pokok"));
+            input_harga_jual.setText(rs.getString("harga_jual"));
             input_stok.setText(rs.getString("stok"));
         }
     } catch (Exception e) {
     }
+}
+
+
+private void view_barang (String sql){
+Object[] header = {"No","Kode","Nama Barang","Satuan","Harga Pokok","Harga Jual","Stok"};
+DefaultTableModel tabel = new DefaultTableModel(null, header);
+list_barang.setModel(tabel);
+try {
+  stat = con.createStatement();
+  rs = stat.executeQuery(sql);
+  byte no = 1;
+  while (rs.next()){
+  String[] Data = {
+      Byte.toString(no),
+      rs.getString("kode_barang"),
+      rs.getString("nama_barang"),
+      rs.getString("satuan"),
+      rs.getString("harga_pokok"),
+      rs.getString("harga_jual"),
+      rs.getString("stok")
+  };  
+  tabel.addRow(Data);
+  no++;
+  }
+  list_barang.getColumnModel().getColumn(0).setPreferredWidth(30);
+  list_barang.getColumnModel().getColumn(1).setPreferredWidth(50);
+  list_barang.getColumnModel().getColumn(2).setPreferredWidth(200);
+} catch (Exception e) {
+  System.err.println (e);
+}
 }
 
 }
